@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fashion Nova — Account Map | Giga Sales</title>
+<style>
+/* ─── RESET & BASE ─────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: #0b0f19;
+  color: #e2e8f0;
+  padding: 28px 24px 60px;
+  min-height: 100vh;
+}
+
+/* ─── HEADER ────────────────────────────────────────────────────── */
+.header { text-align: center; margin-bottom: 20px; }
+.header h1 { font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -.3px; }
+.header .sub { font-size: 11px; color: #475569; margin-top: 3px; }
+
+/* ─── LEGEND ────────────────────────────────────────────────────── */
+.legend {
+  display: flex; justify-content: center; flex-wrap: wrap;
+  gap: 16px; margin-bottom: 28px; font-size: 11px; color: #94a3b8;
+}
+.legend-item { display: flex; align-items: center; gap: 6px; }
+.ld { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.ld-met   { background: #22c55e; }
+.ld-comms { background: #0c1a2e; border: 1.5px solid #0ea5e9; }
+.ld-unmet { background: #1e293b; border: 1.5px solid #475569; }
+.ld-india { background: #78350f; border: 1.5px solid #f59e0b; }
+
+/* ─── THREE-CHAIN WRAPPER ───────────────────────────────────────── */
+.chart-root { display: flex; flex-direction: column; align-items: center; gap: 0; }
+
+.chains {
+  display: flex;
+  gap: 0;
+  align-items: flex-start;
+  justify-content: center;
+  width: 100%;
+}
+
+.chain {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 16px;
+}
+
+.chain-label {
+  font-size: 9px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 1px; color: #334155; margin-bottom: 10px;
+  border-bottom: 1px solid #1e293b; padding-bottom: 4px; width: 100%; text-align: center;
+}
+
+.chain-divider {
+  width: 1px;
+  background: #1e293b;
+  align-self: stretch;
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+
+/* ─── ROW (horizontal group of nodes) ──────────────────────────── */
+.row { display: flex; gap: 8px; align-items: flex-start; justify-content: center; }
+
+/* ─── VERTICAL SPINE between rows ──────────────────────────────── */
+.spine-wrap { width: 100%; position: relative; }
+.spine-wrap svg { display: block; width: 100%; }
+
+/* ─── SUBTREE (node + its children below) ──────────────────────── */
+.subtree { display: flex; flex-direction: column; align-items: center; }
+
+/* ─── NODE ──────────────────────────────────────────────────────── */
+.node {
+  border-radius: 10px; padding: 9px 12px;
+  text-align: center; width: 148px; flex-shrink: 0;
+}
+.node.met        { background: #052e16; border: 1.5px solid #22c55e; box-shadow: 0 0 12px rgba(34,197,94,.2); }
+.node.unmet      { background: #141c2e; border: 1.5px solid #1e3a5f; }
+.node.comms      { background: #0c1a2e; border: 1.5px solid #0ea5e9; box-shadow: 0 0 10px rgba(14,165,233,.2); }
+.node.india-met  { background: #052e16; border: 1.5px solid #22c55e; box-shadow: 0 0 12px rgba(34,197,94,.2), 0 0 0 2.5px #f59e0b; }
+.node.india-unmet{ background: #1a1200; border: 1.5px solid #f59e0b; }
+.node.india-comms{ background: #0c1a2e; border: 1.5px solid #0ea5e9; box-shadow: 0 0 10px rgba(14,165,233,.2), 0 0 0 2.5px #f59e0b; }
+.node.economic-buyer { background: #0f172a; border: 2px solid #6366f1; }
+
+.node-name { font-size: 12px; font-weight: 700; margin-bottom: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.node-name a { text-decoration: none; border-bottom: 1px dashed; padding-bottom: 1px; }
+.node-name a:hover { opacity: .7; }
+
+.node.met .node-name a,
+.node.india-met .node-name a   { color: #86efac; border-color: #4ade80; }
+.node.comms .node-name a,
+.node.india-comms .node-name a { color: #7dd3fc; border-color: #0ea5e9; }
+.node.unmet .node-name a        { color: #93c5fd; border-color: #3b82f6; }
+.node.india-unmet .node-name a  { color: #fcd34d; border-color: #f59e0b; }
+.node.economic-buyer .node-name a { color: #c7d2fe; border-color: #818cf8; }
+
+.node-title { font-size: 9.5px; line-height: 1.4; margin-bottom: 2px; }
+.node.met .node-title, .node.india-met .node-title { color: #4ade80; }
+.node.comms .node-title, .node.india-comms .node-title { color: #38bdf8; }
+.node.unmet .node-title         { color: #4a6a9e; }
+.node.india-unmet .node-title   { color: #ca8a04; }
+.node.economic-buyer .node-title{ color: #818cf8; }
+
+.pills { display: flex; flex-wrap: wrap; gap: 3px; justify-content: center; margin-top: 5px; }
+.pill {
+  font-size: 8px; font-weight: 800; padding: 2px 6px; border-radius: 999px;
+  text-transform: uppercase; letter-spacing: .4px; display: inline-block;
+}
+.p-buyer   { background: #1e1b4b; color: #c7d2fe; border: 1px solid #6366f1; }
+.p-sponsor { background: #14532d; color: #4ade80; border: 1px solid #22c55e; }
+.p-champ   { background: #1e3a5f; color: #7dd3fc; border: 1px solid #38bdf8; }
+.p-met     { background: #052e16; color: #22c55e; }
+.p-comms   { background: #0c2233; color: #7dd3fc; border: 1px solid #0ea5e9; }
+.p-india   { background: #78350f; color: #fcd34d; border: 1px solid #f59e0b; }
+
+/* ─── STRATEGIC NOTES ───────────────────────────────────────────── */
+.notes-section {
+  margin-top: 40px;
+  border-top: 1px solid #1e293b;
+  padding-top: 24px;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.notes-section h2 {
+  font-size: 13px; font-weight: 700; color: #94a3b8;
+  text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px;
+}
+.note-item {
+  display: flex; gap: 12px; margin-bottom: 14px; align-items: flex-start;
+}
+.note-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.note-text { font-size: 13px; line-height: 1.7; color: #94a3b8; }
+.note-text strong { color: #e2e8f0; font-weight: 700; }
+
+/* ─── OTHER ENGINEERS SIDEBAR ───────────────────────────────────── */
+.eng-sidebar {
+  margin-top: 32px;
+  border-top: 1px solid #1e293b;
+  padding-top: 20px;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.eng-sidebar h2 {
+  font-size: 13px; font-weight: 700; color: #64748b;
+  text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;
+}
+.eng-sidebar .eng-sub { font-size: 11px; color: #334155; font-style: italic; margin-bottom: 12px; }
+.eng-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+.eng-chip {
+  background: #141c2e; border: 1px solid #1e293b;
+  border-radius: 8px; padding: 5px 10px; font-size: 11px;
+}
+.eng-chip a { color: #475569; text-decoration: none; border-bottom: 1px dashed #334155; }
+.eng-chip a:hover { color: #94a3b8; }
+.eng-chip .eng-role { font-size: 9.5px; color: #334155; margin-top: 1px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🗺️ Fashion Nova — Account Map</h1>
+  <div class="sub">Giga Sales · April 2026 · Names link to LinkedIn Sales Navigator</div>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="ld ld-met"></div> Met</div>
+  <div class="legend-item"><div class="ld ld-comms"></div> In communication (Slack)</div>
+  <div class="legend-item"><div class="ld ld-unmet"></div> Not yet met</div>
+  <div class="legend-item"><div class="ld ld-india"></div> Indian university connection</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- CHART                                                  -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="chart-root">
+
+  <!-- Richard at the top, centered -->
+  <div class="row" id="row-richard">
+    <div class="node economic-buyer" id="richard">
+      <div class="node-name"><a href="https://www.linkedin.com/sales/lead/ACwAABxUfHEBqlUoNlTzzvcbO5cJIeeJDx1kEIk,NAME_SEARCH,vsIO" target="_blank">Richard Saghian</a></div>
+      <div class="node-title">Founder & CEO</div>
+      <div class="pills"><span class="pill p-buyer">💰 Likely Economic Buyer</span></div>
+    </div>
+  </div>
+
+  <!-- Spine from Richard down to the three chain heads -->
+  <svg id="c-richard" height="32" style="display:block;width:100%;max-width:800px;" xmlns="http://www.w3.org/2000/svg"></svg>
+
+  <!-- THREE CHAINS -->
+  <div class="chains" id="chains-row">
+
+    <!-- ══════════════ RICKY'S CHAIN (Finance + Procurement) ══════════════ -->
+    <div class="chain" id="chain-ricky">
+      <div class="chain-label">Finance &amp; Procurement</div>
+
+      <!-- Ricky -->
+      <div class="row">
+        <div class="node unmet" id="ricky">
+          <div class="node-name"><a href="https://www.linkedin.com/sales/lead/ACwAAAIfO0cBJYA75kqnBLK-EyH6H8f5w97f2FM,NAME_SEARCH,vw2O" target="_blank">Ricky Chandnani</a></div>
+          <div class="node-title">CFO</div>
+        </div>
+      </div>
+
+      <svg id="c-ricky" height="28" style="display:block;width:100%;" xmlns="http://www.w3.org/2000/svg"></svg>
+
+      <!-- Michael Lee + Jennifer side by side under Ricky -->
+      <div class="row" style="align-items:flex-start;">
+
+        <!-- Michael Lee subtree -->
+        <div class="subtree" id="st-michael">
+          <div class="node unmet" id="michael-lee">
+            <div class="node-name"><a href="https://www.linkedin.com/sales/lead/ACwAAAAO0wkBaqtzowtd3c6fV2X3W_AH7AcDd-k,NAME_SEARCH,nKrY" target="_blank">Michael Lee</a></div>
+            <div class="node-title">VP Finance</div>
+          </div>
+        </div>
+
+        <!-- Jennifer Liu subtree (Procurement rolls up to Finance) -->
+        <div class="subtree" id="st-jennifer">
+          <div class="node unmet" id="jennifer">
+            <div class="node-name"><a href="https://www.linkedin.com/sales/lead/ACwAAAF41TgBFoklbxLf6Nbi2VO7enW8jVthNW4,NAME_SEARCH,jt17" target="_blank">Jennifer Liu</a></div>
+            <div class="node-title">Head of Procurement</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <!-- /chain-ricky -->
+
+    <div class="chain-divider"></div>
+
+    <!-- ══════════════ MANAS'S CHAIN (Data & Strategy) ══════════════ -->
+    <div class="chain" id="chain-manas">
+      <div class="chain-label">Data &amp; Strategy</div>
+
+      <!-- Manas -->
+      <div class="row">
+        <div class="node india-unmet" id="manas">
+          <div class="node-name"><a href="https://www.linkedin.com/sales/lead/ACwAAAERqGgBgZ7AjdqM2Hy9x3m-bTZy2bAJgs8,NAME_SEARCH,adr4" target="_blank">Manas Bhat</a></div>
+          <div class="node-title">VP Data Science &amp; Analytics</div>
+          <div class="pills"><span class="pill p-india">🎓 NITK '04</span></div>
+        </div>
+      </div>
+
+      <svg id="c-manas" height="28" style="display:block;width:100%;" xmlns="http://www.w3.org/2000/svg"></svg>
+
+      <!-- Max Wardaki -->
+      <div class="row">
+        <div class="node unmet" id="max">
+          <div class="node-name"><a href="https://www.linkedin.com/sales/lead/ACwAABKZXncBkazzp0uF35MrynGRqXl2Q5Ly2AY,NAME_SEARCH,WCqA" target="_blank">Max Wardaki</a></div>
+          <div class="node-title">Dir. Strategy &amp; Operations</div>
+        </div>
+      </div>
+    </div>
+    <!-- /chain-manas -->
+
+    <div class="chain-divider"></div>
+
+    <!-- ══════════════ ROGER'S CHAIN ══════════════ -->
+    <div class="chain" id="chain-roger">
+      <div class="chain-label">Technology Chain</div>
+
+      <!-- Roger -->
+      <div class="row">
+        <div class="node met" id="roger">
+          <div class="node-name"><a href="https://www.linkedin.com/sales/lead/ACwAAAZZovgBa8BalLMksqB_AxzopV29Ed79Zls,NAME_SEARCH,bCeL" target="_blank">Roger S.</a></div>
+          <div class="node-title">VP of Technology</div>
+          <div class="pills">
+            <span class="pill p-sponsor">★ Exec Sponsor</span>
+            <span class="pill p-champ">Champion</span>
+            <span class="pill p-met">Met ✓</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Spine Roger → L2 -->
+      <svg id="c-roger" height="28" style="display:block;width:100%;" xmlns="http://www.w3.org/2000/svg"></svg>
+
+      <!-- L2: Kent subtree | Surag subtree | Neeraj subtree -->
+      <div class="row" id="row-l2" style="align-items:flex-start;">
+
+        <!-- Kent subtree -->
+        <div class="subtree" id="st-kent">
+          <div class="node unmet" id="kent">
+            <div class="node-name"><a href="https://www.linkedin.com/sales/lead/ACwAAAcNwkwBz8TSSfQh-mI2AR96EIfAspRvLac,NAME_SEARCH,PgzS" target="_blank">Kent Fuller</a></div>
+            <div class="node-title">Director of IT</div>
+          </div>
+          <svg id="c-kent" height="24" style="display:block;width:100%;" xmlns="http://www.w3.org/2000/svg"></svg>
+          <div class="row">
+            <div class="node unmet" id="james">
+              <div class="node-name"><a href="https://www.linkedin.com/sales/lead/ACwAABezbMYBaHriyux9y8sNWFQexhKJx5uqRPM,NAME_SEARCH,SFJm" target="_blank">James Barham</a></div>
+              <div class="node-title">IT Manager</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Surag subtree -->
+        <div class="subtree" id="st-surag">
+          <div class="node met" id="surag">
+            <div class="node-name"><a href="https://www.linkedin.com/sales/lead/ACwAAAca25ABrE6BMl-5B_ylPo7zgAkNdVMuug4,NAME_SEARCH,3To_" target="_blank">Surag Betageri</a></div>
+            <div class="node-title">Dir. Product Management</div>
+            <div class="pills">
+              <span class="pill p-champ">Champion / Influencer</span>
+              <span class="pill p-met">Met ✓</span>
+            </div>
+          </div>
+          <svg id="c-surag" height="24" style="display:block;width:100%;" xmlns="http://www.w3.org/2000/svg"></svg>
+          <div class="row" id="row-pm">
+            <div class="node unmet" id="vinay">
+              <div class="node-name"><a href="https://www.linkedin.com/sales/lead/ACwAAACa_EYBzvZAw0jnIVu7AO9v0L-8TCsC_WQ,NAME_SEARCH,BoRC" target="_blank">Vinay Venkatesh</a></div>
+              <div class="node-title">Product Management Head</div>
+            </div>
+            <div class="node unmet" id="christopher">
+              <div class="node-name"><a href="https://www.linkedin.com/sales/lead/ACwAAA7ph-sBEZqIM0US8li8mA7eL0P3vKIndYM,NAME_SEARCH,BWqq" target="_blank">Christopher Anderson</a></div>
+              <div class="node-title">Sr. Technical PM</div>
+            </div>
+            <div class="node comms" id="lee-goldin">
+              <div class="node-name"><a href="https://www.linkedin.com/sales/lead/ACwAAAM6exEBWBbNDcGqXmZlgS7vvPROF2rQZyw,NAME_SEARCH,tS9i" target="_blank">Lee Goldin</a></div>
+              <div class="node-title">Senior Product Manager</div>
+              <div class="pills"><span class="pill p-comms">💬 In Slack</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Neeraj subtree -->
+        <div class="subtree" id="st-neeraj">
+          <div class="node india-comms" id="neeraj">
+            <div class="node-name"><a href="https://www.linkedin.com/sales/lead/ACwAAAJvcTYBEGikIk7WRaQsV_28PjN7ydUaqFs,NAME_SEARCH,Pk_P" target="_blank">Neeraj M.</a></div>
+            <div class="node-title">Sr. Director of Engineering</div>
+            <div class="pills">
+              <span class="pill p-champ">Champion / Influencer</span>
+              <span class="pill p-comms">💬 In Slack</span>
+              <span class="pill p-india">🎓 JNTU</span>
+            </div>
+          </div>
+          <svg id="c-neeraj" height="24" style="display:block;width:100%;" xmlns="http://www.w3.org/2000/svg"></svg>
+          <div class="row">
+            <div class="node met" id="eduardo">
+              <div class="node-name"><a href="https://www.linkedin.com/sales/lead/ACwAABN5pg8BIXSkHHH01CZNsJ4_n8CFtqcMoSk,NAME_SEARCH,sQi-" target="_blank">Eduardo Aceituno</a></div>
+              <div class="node-title">Senior Software Engineer</div>
+              <div class="pills">
+                <span class="pill p-champ">Champion / Influencer</span>
+                <span class="pill p-met">Met ✓</span>
+              </div>
+            </div>
+            <div class="node india-met" id="vijay">
+              <div class="node-name"><a href="https://www.linkedin.com/sales/lead/ACwAAAFEWwgBF5m-QgurmBhHQCy14czKihRleRU,NAME_SEARCH,JlJm" target="_blank">Vijay Sukumar</a></div>
+              <div class="node-title">Staff Software Engineer</div>
+              <div class="pills">
+                <span class="pill p-champ">Champion / Influencer</span>
+                <span class="pill p-met">Met ✓</span>
+                <span class="pill p-india">🎓 Univ. of Madras</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /row-l2 -->
+    </div><!-- /chain-roger -->
+
+  </div><!-- /chains -->
+</div><!-- /chart-root -->
+
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- OTHER ENGINEERS                                        -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="eng-sidebar">
+  <h2>Other Engineers</h2>
+  <div class="eng-sub">Not yet met — unclear if included in project</div>
+  <div class="eng-grid">
+    <div class="eng-chip"><a href="https://www.linkedin.com/sales/lead/ACwAAAzFiOUBRXY6DPNtUsL9WK1A4RopBPUuUwM,NAME_SEARCH,GgZw" target="_blank">Sarah Bostwick</a><div class="eng-role">Software Eng. Manager</div></div>
+    <div class="eng-chip"><a href="https://www.linkedin.com/sales/lead/ACwAAABCAikBjz5nNfR8bJB8_3p4Cjh_Yh48m_w,NAME_SEARCH,Cij7" target="_blank">Stephen McGroarty</a><div class="eng-role">Sr. Technical Engineer</div></div>
+    <div class="eng-chip"><a href="https://www.linkedin.com/sales/lead/ACwAACC_zmABF1WQJUi8pHtAJvZsWe3clFkzxRM,NAME_SEARCH,8P7z" target="_blank">Hang Hua</a><div class="eng-role">Senior Software Engineer</div></div>
+    <div class="eng-chip"><a href="https://www.linkedin.com/sales/lead/ACwAAASf5SgBzPwqjmHU4a3z_aqnS0aGZvswAb0,NAME_SEARCH,xMHd" target="_blank">Darin Tanaka</a><div class="eng-role">Sr. Software Engineer</div></div>
+    <div class="eng-chip"><a href="https://www.linkedin.com/sales/lead/ACwAAA58iesBpwOpsKp_gD4CVVAB5sN5WesauQA,NAME_SEARCH,Kvpo" target="_blank">Peter V.</a><div class="eng-role">Software Engineer</div></div>
+    <div class="eng-chip"><a href="https://www.linkedin.com/sales/lead/ACwAABEYj38BgWK_6Zzj9lBVtWe7YfxSjPLfpdA,NAME_SEARCH,VbHx" target="_blank">Xihua Yang</a><div class="eng-role">Software Engineer</div></div>
+    <div class="eng-chip"><a href="https://www.linkedin.com/sales/lead/ACwAABawlMYBRBsGgwckoL2M4w3XeDX_CnCcz7w,NAME_SEARCH,q5Y_" target="_blank">Judy Song</a><div class="eng-role">Software Engineer</div></div>
+    <div class="eng-chip"><a href="https://www.linkedin.com/sales/lead/ACwAABqE6tIBWGeI1SEABEXKNDM5KiAVU0Sk_G4,NAME_SEARCH,NNUe" target="_blank">Abigail Martinez</a><div class="eng-role">Software Engineer</div></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- STRATEGIC NOTES                                        -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="notes-section">
+  <h2>📋 Strategic Notes</h2>
+
+  <div class="note-item">
+    <div class="note-icon">★</div>
+    <div class="note-text">
+      <strong>Roger is our confirmed Exec Sponsor and Champion.</strong> He is the initial entry point into Fashion Nova and has been actively engaged from the start. He should be kept closely informed and nurtured throughout the deal cycle.
+    </div>
+  </div>
+
+  <div class="note-item">
+    <div class="note-icon">💰</div>
+    <div class="note-text">
+      <strong>Economic Buyer — TBD, likely Richard Saghian.</strong> Given the scale of this potential deal, the true economic buyer may sit at the CEO level. Richard is the Founder and ultimate decision-maker at Fashion Nova. We have not yet validated this — uncovering and getting in front of the economic buyer should be a near-term priority.
+    </div>
+  </div>
+
+  <div class="note-item">
+    <div class="note-icon">🤝</div>
+    <div class="note-text">
+      <strong>Build Surag into a stronger Champion.</strong> Roger visibly respects Surag and listens to him — Surag carries real influence over Roger's decisions. We should invest in him as a champion: ensure he deeply understands the value, equip him with the right materials, and position him to advocate internally at the director and VP level.
+    </div>
+  </div>
+
+  <div class="note-item">
+    <div class="note-icon">🎯</div>
+    <div class="note-text">
+      <strong>Get in front of Neeraj.</strong> As Sr. Director of Engineering, Neeraj leads the technical team directly involved in this project. We have not yet met with him and need to establish a relationship. Neeraj has the ability to validate or block adoption at the engineering level.
+    </div>
+  </div>
+
+  <div class="note-item">
+    <div class="note-icon">🌱</div>
+    <div class="note-text">
+      <strong>Build groundswell across Neeraj and Surag's teams.</strong> Eduardo and Vijay are already engaged and leaning in — they are our beachhead at the IC level. We should expand coverage across the broader PM team (Vinay, Christopher, Lee) and the engineering org to create bottom-up momentum that reinforces the top-down sponsorship from Roger.
+    </div>
+  </div>
+
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- CONNECTOR DRAWING SCRIPT                               -->
+<!-- ══════════════════════════════════════════════════════ -->
+<script>
+function cx(el, svg) {
+  return el.getBoundingClientRect().left + el.getBoundingClientRect().width / 2
+         - svg.getBoundingClientRect().left;
+}
+function line(svg, x1, y1, x2, y2, color) {
+  const l = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  l.setAttribute('x1', x1); l.setAttribute('y1', y1);
+  l.setAttribute('x2', x2); l.setAttribute('y2', y2);
+  l.setAttribute('stroke', color || '#1e3a5f');
+  l.setAttribute('stroke-width', '1.5');
+  l.setAttribute('stroke-linecap', 'round');
+  svg.appendChild(l);
+}
+function fan(svgEl, parentEl, childEls, color) {
+  svgEl.innerHTML = '';
+  const h = svgEl.getBoundingClientRect().height;
+  const mid = h / 2;
+  const px = cx(parentEl, svgEl);
+  line(svgEl, px, 0, px, mid, color);
+  const xs = childEls.map(c => cx(c, svgEl));
+  if (xs.length > 1) line(svgEl, Math.min(...xs), mid, Math.max(...xs), mid, color);
+  xs.forEach(x => line(svgEl, x, mid, x, h, color));
+}
+function singleDrop(svgEl, parentEl, childEl, color) {
+  svgEl.innerHTML = '';
+  const h = svgEl.getBoundingClientRect().height;
+  const mid = h / 2;
+  const px = cx(parentEl, svgEl);
+  const chx = cx(childEl, svgEl);
+  line(svgEl, px, 0, px, mid, color);
+  line(svgEl, px, mid, chx, mid, color);
+  line(svgEl, chx, mid, chx, h, color);
+}
+
+function render() {
+  const GRN = '#22c55e';
+  const BLU = '#1e3a5f';
+
+  // Richard → Ricky, Manas, Roger
+  fan(document.getElementById('c-richard'),
+      document.getElementById('richard'),
+      [document.getElementById('ricky'),
+       document.getElementById('manas'),
+       document.getElementById('roger')], BLU);
+
+  // Ricky → Michael Lee, Jennifer
+  fan(document.getElementById('c-ricky'),
+      document.getElementById('ricky'),
+      [document.getElementById('michael-lee'),
+       document.getElementById('jennifer')], BLU);
+
+  // Manas → Max
+  singleDrop(document.getElementById('c-manas'),
+             document.getElementById('manas'),
+             document.getElementById('max'), BLU);
+
+  // Roger → Kent, Surag, Neeraj
+  fan(document.getElementById('c-roger'),
+      document.getElementById('roger'),
+      [document.getElementById('kent'),
+       document.getElementById('surag'),
+       document.getElementById('neeraj')], GRN);
+
+  // Kent → James
+  singleDrop(document.getElementById('c-kent'),
+             document.getElementById('kent'),
+             document.getElementById('james'), BLU);
+
+  // Surag → PM team
+  fan(document.getElementById('c-surag'),
+      document.getElementById('surag'),
+      [document.getElementById('vinay'),
+       document.getElementById('christopher'),
+       document.getElementById('lee-goldin')], GRN);
+
+  // Neeraj → Eduardo, Vijay
+  fan(document.getElementById('c-neeraj'),
+      document.getElementById('neeraj'),
+      [document.getElementById('eduardo'),
+       document.getElementById('vijay')], GRN);
+}
+
+setTimeout(render, 180);
+window.addEventListener('resize', () => { setTimeout(render, 50); });
+</script>
+</body>
+</html>
